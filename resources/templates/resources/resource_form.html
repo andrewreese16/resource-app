@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+  
+  {% if resource %}
+    Edit Resource
+  {% else %}
+    Add Resource
+  {% endif %}
+    
+{% endblock title %}
+
+
+{% block content %}
+  <h2>
+  {% if resource %}
+    Edit resource
+  {% else %}
+    Add Resource
+  {% endif %}
+    </h2>
+    <form action="" method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">
+      {% if resource %}
+      Update        
+      {% else %}
+        Create
+      {% endif %}
+        </button>
+    </form>
+    <a href="{% url 'resource_list' %}">Cancel</a>
+{% endblock content %}
+  
+  

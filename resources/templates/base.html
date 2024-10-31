@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %} Local Resource Hub {% endblock title %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ul>
+          <li><a href="{% url 'resource_list' %}">Home</a></li>
+          {% if user.is_authenticated%}
+          <form id="logout-form" method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Log out</button>
+          </form>
+          {% else %}
+          <li><a href="{% url 'login' %}">Login</a></li>
+          <li><a href="{% url 'register' %}">Register</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </header>
+    <main>{% block content %} {% endblock content %}</main>
+  </body>
+</html>
