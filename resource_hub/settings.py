@@ -123,10 +123,11 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = 'resource_list'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'resource/static'), 
+    os.path.join(BASE_DIR, 'resources/static'), 
 ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
