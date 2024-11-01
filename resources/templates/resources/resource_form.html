@@ -1,6 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
 
-
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/resources/resource_form.css' %}">
+{% endblock head %}
+  
 {% block title %}
   
   {% if resource %}
@@ -20,18 +24,20 @@
     Add Resource
   {% endif %}
     </h2>
-    <form action="" method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">
-      {% if resource %}
-      Update        
-      {% else %}
-        Create
-      {% endif %}
+    <div class="resource-form"> <!-- Specific wrapper class -->
+      <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" id="create-edit">
+          {% if resource %}
+            Update        
+          {% else %}
+            Create
+          {% endif %}
         </button>
-    </form>
-    <a href="{% url 'resource_list' %}">Cancel</a>
+      </form>
+      <a href="{% url 'resource_list' %}">Cancel</a>
+    </div>
 {% endblock content %}
   
   

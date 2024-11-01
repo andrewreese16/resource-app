@@ -1,4 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/resources/resource_list.css' %}">
+{% endblock head %}
+  
 
 {% block title %}
     Resources

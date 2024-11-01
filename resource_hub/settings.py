@@ -28,10 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'resource_hub/static'),  # Adjust 'your_app' to your actual app name
-]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -125,6 +121,10 @@ STATIC_URL = "static/"
 LOGOUT_REDIRECT_URL = "login"
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = 'resource_list'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'resource/static'), 
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

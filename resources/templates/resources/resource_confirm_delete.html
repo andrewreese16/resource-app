@@ -1,9 +1,15 @@
 {% extends 'base.html' %} {% block title %} Delete Resource {% endblock title %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/resources/delete.css' %}">
+{% endblock head %}
+  
 {% block content %}
 <h2>Are you sure you want to delete "{{ object.name }}"?</h2>
 <form action="" method="post">
   {% csrf_token %}
-  <button type="submit">Yes, Delete</button>
+  <button type="submit" id="btn-danger">Yes, Delete</button>
 </form>
 <a href="{% url 'resource_list' %}">Cancel</a>
 {% endblock content %}
