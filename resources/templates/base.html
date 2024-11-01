@@ -16,8 +16,10 @@
     <header>
       <nav>
         <ul>
-          <li><a href="{% url 'resource_list' %}">Home</a></li>
+          <li><a href="{% url 'home' %}">Home</a></li>
           {% if user.is_authenticated%}
+          <li><a href="{% url 'resource_list' %}">My Resources</a></li>
+          <li><a href="{% url 'resource_create' %}">Add New Resources</a></li>
           <form id="logout-form" method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit" id="btn-logout">Log out</button>

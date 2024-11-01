@@ -11,28 +11,19 @@
 {% endblock title %}
 
 {% block content %}
-    <h2>Available Resources</h2>
+    <h2>My Saved Resources</h2>
     <table>
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Description</th>
                 <th>Category</th>
-                <th>Contact Info</th>
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for resource in resources %}
                 <tr>
-                    <td>{{ resource.name }}</td>
-                    <td>{{ resource.description }}</td>
+                    <td><a href="{% url 'resource-detail' resource.id %}">{{ resource.name }}</a></td>
                     <td>{{ resource.category }}</td>
-                    <td>{{ resource.contact_info }}</td>
-                    <td>
-                        <a href="{% url 'resource_update' resource.id %}">Edit</a>
-                        <a href="{% url 'resource_delete' resource.id %}">Delete</a>
-                    </td>
                 </tr>
             {% empty %}
                 <tr>
@@ -41,5 +32,4 @@
             {% endfor %}
         </tbody>
     </table>
-    <a href="{% url 'resource_create' %}">Add New Resources</a>
 {% endblock content %}

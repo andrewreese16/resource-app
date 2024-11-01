@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock head %}
+  
+{% block content %}
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Discover Local Resources and Services That Meet Your Needs</h1>
+    <p>Find food banks, shelters, waste disposal sites, and more in your community.</p>
+  </section>
+  <section class="how-it-works">
+    <h2>How It Works</h2>
+    <p>Find resources, connect with the community, and make a difference.</p>
+    <div class="steps">
+      <div class="step">Search for resources</div>
+      <div class="step">Browse community listings</div>
+      <div class="step">Add or recommend resources</div>
+    </div>
+  </section>
+</div>
+{% endblock content %}

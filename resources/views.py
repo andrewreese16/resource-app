@@ -1,11 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from .models import Resource
 from .forms import ResourceForm
+
+@login_required
+def resource_detail(request, resource_id):
+    resource_from_db = Resource.objects.get(id=resource_id)
+    return render(request, 'resources/detail.html', {'resource': resource_from_db})
 
 
 class RegisterView(View):
@@ -23,10 +29,10 @@ class RegisterView(View):
 
 
 class Home(LoginView):
-    template_name = "registration/login.html"
+    template_name = "resources/home.html"
 
     def get_success_url(self):
-        return redirect("resource_list")
+        return redirect("home.html")
 
 
 class ResourceListView(LoginRequiredMixin, View):

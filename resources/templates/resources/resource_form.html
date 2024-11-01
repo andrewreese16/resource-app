@@ -19,12 +19,12 @@
 {% block content %}
   <h2>
   {% if resource %}
-    Edit resource
+    Edit Resource
   {% else %}
     Add Resource
   {% endif %}
     </h2>
-    <div class="resource-form"> <!-- Specific wrapper class -->
+    <div class="resource-form">
       <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p }}
