@@ -4,7 +4,6 @@
 {% block head %}
   <link rel="stylesheet" href="{% static 'css/resources/resource_list.css' %}">
 {% endblock head %}
-  
 
 {% block title %}
     Resources
@@ -12,6 +11,15 @@
 
 {% block content %}
     <h2>My Saved Resources</h2>
+    <form method="get" action="{% url 'resource_list' %}">
+        <input type="text" name="q" placeholder="Search resources..." value="{{ query|default:'' }}">
+        <button type="submit">Search</button>
+        
+        {% if query %}
+            <button type="submit" name="clear" value="true">Clear</button>
+        {% endif %}
+    </form>
+
     <table>
         <thead>
             <tr>
@@ -27,7 +35,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5">No resources found.</td>
+                    <td colspan="2">No resources found.</td>
                 </tr>
             {% endfor %}
         </tbody>

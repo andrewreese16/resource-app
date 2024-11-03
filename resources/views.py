@@ -11,7 +11,7 @@ from .forms import ResourceForm
 @login_required
 def resource_detail(request, resource_id):
     resource_from_db = Resource.objects.get(id=resource_id)
-    return render(request, 'resources/detail.html', {'resource': resource_from_db})
+    return render(request, "resources/detail.html", {"resource": resource_from_db})
 
 
 class RegisterView(View):
@@ -37,8 +37,21 @@ class Home(LoginView):
 
 class ResourceListView(LoginRequiredMixin, View):
     def get(self, request):
-        resources = Resource.objects.filter(user=request.user)
-        return render(request, "resources/resource_list.html", {"resources": resources})
+        query = request.GET.get("q")
+        if request.GET.get("clear"):
+            query = None
+        if query:
+            resources = Resource.objects.filter(
+                user=request.user, name__icontains=query
+            )
+        else:
+            resources = Resource.objects.filter(user=request.user)
+
+        return render(
+            request,
+            "resources/resource_list.html",
+            {"resources": resources, "query": query},
+        )
 
 
 class ResourceCreateView(LoginRequiredMixin, View):
