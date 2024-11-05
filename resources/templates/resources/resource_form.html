@@ -4,40 +4,78 @@
 {% block head %}
   <link rel="stylesheet" href="{% static 'css/resources/resource_form.css' %}">
 {% endblock head %}
-  
+
 {% block title %}
-  
   {% if resource %}
     Edit Resource
   {% else %}
     Add Resource
   {% endif %}
-    
 {% endblock title %}
-
 
 {% block content %}
   <h2>
-  {% if resource %}
-    Edit Resource
-  {% else %}
-    Add Resource
-  {% endif %}
-    </h2>
-    <div class="resource-form">
-      <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" id="create-edit">
-          {% if resource %}
-            Update        
-          {% else %}
-            Create
-          {% endif %}
-        </button>
-      </form>
-      <a href="{% url 'resource_list' %}">Cancel</a>
-    </div>
+    {% if resource %}
+      Edit Resource
+    {% else %}
+      Add Resource
+    {% endif %}
+  </h2>
+  
+  <div class="search-resources">
+    <h3>Find Local Resources</h3>
+    <form method="get" action="{% url 'resource_create' %}">
+      <label for="query">ZIP Code:</label>
+      <input type="text" id="query" name="query" placeholder="Enter ZIP Code" value="{{ query }}">
+      
+      <label for="keyword">Search for:</label>
+      <input type="text" id="keyword" name="keyword" placeholder="e.g., food banks, shelters" value="{{ keyword }}">
+      
+      <button type="submit">Search</button>
+    </form>
+    
+    
+    {% if error_message %}
+      <div class="alert alert-warning">{{ error_message }}</div>
+    {% endif %}
+    
+    {% if resources %}
+      <h4>Search Results for "{{ query }}":</h4>
+      <div class="search-results-container">
+        <ul>
+          {% for resource in resources %}
+            <li>
+              <strong>{{ resource.name }}</strong><br>
+              Address: {{ resource.address }}<br>
+              Types: {{ resource.types|join:", " }}<br>
+              {% if resource.phone_number %}
+                Phone: {{ resource.phone_number }}
+              {% else %}
+                Phone: Not available
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% elif query and not error_message %}
+      <p>No results found for "{{ query }}".</p>
+    {% endif %}
+  </div>
+  
+  <hr>
+  
+  <div class="resource-form">
+    <form action="" method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" id="create-edit">
+        {% if resource %}
+          Update        
+        {% else %}
+          Create
+        {% endif %}
+      </button>
+    </form>
+    <a href="{% url 'resource_list' %}">Cancel</a>
+  </div>
 {% endblock content %}
-  
-  

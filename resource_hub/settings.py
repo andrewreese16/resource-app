@@ -9,14 +9,27 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import environ
 import os
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
+
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+# API_KEY = env('API_KEY')
+env = environ.Env()
+environ.Env.read_env()  # Read .env file, if it exists
+
+# Getting the API_KEY from the environment
+API_KEY = env('API_KEY')
+
+# Print to debug (optional)
+print("API_KEY:", API_KEY)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 

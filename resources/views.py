@@ -7,10 +7,52 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from .models import Resource
 from .forms import ResourceForm
+import requests
+from django.conf import settings
+from django.http import JsonResponse
+
+
+def search_resources(request):
+    query = request.GET.get("query", "resources")
+    location = request.GET.get("location", "37.7749,-122.4194")
+
+    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+    params = {
+        "key": settings.API_KEY,
+        "location": location,
+        "radius": 5000,
+        "keyword": query,
+    }
+
+    resources = []
+
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        resources = [
+            {
+                "name": place.get("name"),
+                "address": place.get("vicinity"),
+                "location": place.get("geometry", {}).get("location"),
+                "types": place.get("types"),
+            }
+            for place in data.get("results", [])
+        ]
+
+    except requests.exceptions.RequestException as e:
+
+        return render(
+            request,
+            "resources/resource_form.html",
+            {"resources": resources, "query": query},
+        )
+
 
 @login_required
 def resource_detail(request, resource_id):
-    resource_from_db = Resource.objects.get(id=resource_id)
+    resource_from_db = get_object_or_404(Resource, id=resource_id)
     return render(request, "resources/detail.html", {"resource": resource_from_db})
 
 
@@ -32,7 +74,7 @@ class Home(LoginView):
     template_name = "resources/home.html"
 
     def get_success_url(self):
-        return redirect("home.html")
+        return redirect("home")
 
 
 class ResourceListView(LoginRequiredMixin, View):
@@ -57,16 +99,123 @@ class ResourceListView(LoginRequiredMixin, View):
 class ResourceCreateView(LoginRequiredMixin, View):
     def get(self, request):
         form = ResourceForm()
-        return render(request, "resources/resource_form.html", {"form": form})
+        query = request.GET.get("query", "").strip()
+        keyword = request.GET.get("keyword", "").strip()
+        location = None
+        resources = []
+        error_message = None
+        if query.isdigit():
+            location = self.get_coordinates_from_zip(query)
+            if not location:
+                error_message = f"Could not retrieve location for ZIP code: {query}"
+        if location:
+            search_query = keyword if keyword else query
+            resources = self.search_resources(search_query, location)
+            if not resources:
+                error_message = (
+                    f"No resources found for '{search_query}' in this location."
+                )
 
-    def post(self, request):
-        form = ResourceForm(request.POST)
-        if form.is_valid():
-            resource = form.save(commit=False)
-            resource.user = request.user
-            resource.save()
-            return redirect("resource_list")
-        return render(request, "resources/resource_form.html", {"form": form})
+        return render(
+            request,
+            "resources/resource_form.html",
+            {
+                "form": form,
+                "resources": resources,
+                "query": query,
+                "keyword": keyword,
+                "location": location,
+                "no_results": not resources,
+                "error_message": error_message,
+            },
+        )
+
+    def get_coordinates_from_zip(self, zip_code):
+        """Convert a ZIP code to latitude and longitude using the Geocoding API."""
+        url = "https://maps.googleapis.com/maps/api/geocode/json"
+        params = {
+            "key": settings.API_KEY,
+            "address": zip_code,
+        }
+
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            if data["results"]:
+                location = data["results"][0]["geometry"]["location"]
+                return f"{location['lat']},{location['lng']}"
+            else:
+                return None
+        except requests.exceptions.RequestException as e:
+            return None
+
+    def search_resources(self, query, location):
+        """Search for resources using the Places API with increasing radius if no results are found."""
+        url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+        initial_radius = 5000
+        max_radius = 50000
+        step_radius = 10000
+        resources = []
+
+        while initial_radius <= max_radius and not resources:
+            params = {
+                "key": settings.API_KEY,
+                "location": location,
+                "radius": initial_radius,
+                "keyword": query,
+                "type": "point_of_interest",
+            }
+
+            try:
+                response = requests.get(url, params=params)
+                response.raise_for_status()
+                data = response.json()
+                if data.get("status") == "OK":
+                    for place in data.get("results", []):
+                        place_details = self.get_place_details(place.get("place_id"))
+                        resources.append(
+                            {
+                                "name": place.get("name"),
+                                "address": place.get("vicinity"),
+                                "location": place.get("geometry", {}).get("location"),
+                                "types": place.get("types"),
+                                "phone_number": (
+                                    place_details.get("formatted_phone_number")
+                                    if place_details
+                                    else None
+                                ),
+                            }
+                        )
+                elif data.get("status") == "ZERO_RESULTS":
+                    initial_radius += step_radius
+                else:
+                    break
+
+            except requests.exceptions.RequestException as e:
+                break
+
+        return resources
+
+    def get_place_details(self, place_id):
+        """Fetch detailed information for a place, including the phone number."""
+        url = "https://maps.googleapis.com/maps/api/place/details/json"
+        params = {
+            "key": settings.API_KEY,
+            "place_id": place_id,
+            "fields": "formatted_phone_number",
+        }
+
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            if data.get("status") == "OK":
+                return data.get("result", {})
+            else:
+                return None
+        except requests.exceptions.RequestException as e:
+            return None
 
 
 class ResourceUpdateView(LoginRequiredMixin, View):

@@ -8,6 +8,7 @@ django = "*"
 psycopg2-binary = "*"
 requests = "*"
 googlemaps = "*"
+django-environ = "*"
 
 [dev-packages]
 

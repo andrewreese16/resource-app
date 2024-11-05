@@ -1,14 +1,110 @@
-/* Global styles for body */
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f4f4f4; 
-  color: #333; 
+  font-family: "Arial", sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
   line-height: 1.6;
-  margin: 0; 
+  margin: 0;
 }
 
 main {
   padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+h2 {
+  font-size: 2em;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.search-resources {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.search-resources h3 {
+  font-size: 1.5em;
+  color: #007bff;
+  margin-bottom: 15px;
+}
+
+.search-resources form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-resources label {
+  font-weight: bold;
+  color: #333;
+}
+
+.search-resources input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+  transition: border-color 0.3s ease;
+}
+
+.search-resources input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.search-resources button[type="submit"] {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 12px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-resources button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.alert {
+  background-color: #ffebcc;
+  color: #b85c00;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.search-resources ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.search-resources li {
+  background: #e9ecef;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.search-resources li strong {
+  font-size: 1.1em;
+  color: #333;
+}
+
+.search-resources li span {
+  display: block;
+  color: #555;
+  margin-top: 5px;
 }
 
 .resource-form {
@@ -21,12 +117,6 @@ main {
   margin: auto;
 }
 
-h2 {
-  margin-bottom: 20px;
-  font-size: 1.8em;
-  text-align: center;
-}
-
 .resource-form input,
 .resource-form textarea {
   width: 100%;
@@ -34,7 +124,6 @@ h2 {
   margin: 10px 0;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-sizing: border-box;
   font-size: 1em;
   transition: border-color 0.3s ease;
 }
@@ -45,25 +134,34 @@ h2 {
   outline: none;
 }
 
+.search-resources button[type="submit"] {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto;
+  margin: 0 auto;
+}
+
 .resource-form #create-edit {
-  padding: 12px 15px;
+  padding: 8px 12px;
   background-color: #007bff;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1em;
-  width: 100%;
+  font-size: 0.9em;
+  width: auto;
+  margin: 10px 0;
   transition: background-color 0.3s ease;
 }
 
 .resource-form #create-edit:hover {
   background-color: #0056b3;
-}
-
-#logout-form {
-  display: inline;
-  margin: 0;
 }
 
 .resource-form a {
@@ -76,4 +174,39 @@ h2 {
 
 .resource-form a:hover {
   text-decoration: underline;
+}
+
+.search-results-container {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  padding: 10px;
+}
+
+.search-results-container ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-results-container li {
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #e9ecef;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 600px) {
+  .search-resources form,
+  .resource-form {
+    padding: 15px;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
 }
