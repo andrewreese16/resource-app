@@ -25,15 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-# API_KEY = env('API_KEY')
 env = environ.Env()
-environ.Env.read_env()  # Read .env file, if it exists
-
-# Getting the API_KEY from the environment
+environ.Env.read_env() 
 API_KEY = env('API_KEY')
-
-# Print to debug (optional)
-print("API_KEY:", API_KEY)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
