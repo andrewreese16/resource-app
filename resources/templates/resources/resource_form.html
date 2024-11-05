@@ -65,7 +65,7 @@
   <hr>
   
   <div class="resource-form">
-    <form method="post" action="{% if resource %}{% url 'resource_edit' resource.id %}{% else %}{% url 'resource_create' %}{% endif %}">
+    <form method="post" action="{% if resource %}{% url 'resource_update' resource.id %}{% else %}{% url 'resource_create' %}{% endif %}">
       {% csrf_token %}
       {{ form.as_p }}
       <button type="submit" id="create-edit">

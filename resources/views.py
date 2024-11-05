@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
+from django.urls import reverse
 from django.contrib.auth.forms import UserCreationForm
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -16,9 +17,9 @@ from django.http import JsonResponse
 def search_resources(request):
     resources = []
     query = request.GET.get("query", "").strip()
-    location = request.GET.get("location", "37.7749,-122.4194")  # Default location if not provided
+    location = request.GET.get("location", "37.7749,-122.4194")
 
-    if query:  # Proceed only if a query is provided
+    if query:
         url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
         params = {
             "key": settings.API_KEY,
@@ -26,12 +27,10 @@ def search_resources(request):
             "radius": 5000,
             "keyword": query,
         }
-
         try:
             response = requests.get(url, params=params)
-            response.raise_for_status()  # Raise an error for bad responses
+            response.raise_for_status()
             data = response.json()
-
             resources = [
                 {
                     "name": place.get("name"),
@@ -41,22 +40,15 @@ def search_resources(request):
                 }
                 for place in data.get("results", [])
             ]
-
         except requests.exceptions.RequestException as e:
-            # Log the error if needed
-            print(f"Error fetching resources: {e}")
-
-            # Return an empty resources list if there was an error
             resources = []
-
-    # Render the form with the resources found (or an empty list if none found)
     return render(
         request,
         "resources/resource_form.html",
         {
             "resources": resources,
             "query": query,
-            "no_results": not resources,  # This will help in handling the UI
+            "no_results": not resources,
             "error_message": "No resources found." if not resources else None,
         },
     )
@@ -116,12 +108,10 @@ class ResourceCreateView(LoginRequiredMixin, View):
         location = None
         resources = []
         error_message = None
-
         if query.isdigit():
             location = self.get_coordinates_from_zip(query)
             if not location:
                 error_message = f"Could not retrieve location for ZIP code: {query}"
-        
         if location:
             search_query = keyword if keyword else query
             resources = self.search_resources(search_query, location)
@@ -129,7 +119,6 @@ class ResourceCreateView(LoginRequiredMixin, View):
                 error_message = (
                     f"No resources found for '{search_query}' in this location."
                 )
-
         return render(
             request,
             "resources/resource_form.html",
@@ -148,10 +137,9 @@ class ResourceCreateView(LoginRequiredMixin, View):
         form = ResourceForm(request.POST)
         if form.is_valid():
             resource = form.save(commit=False)
-            resource.user = request.user  # Associate the resource with the logged-in user
+            resource.user = request.user
             resource.save()
-            return redirect("resource_list")  # Redirect to the resource list after creation
-        # If the form is not valid, re-render the form with error messages
+            return redirect("resource_list")
         return render(
             request,
             "resources/resource_form.html",
@@ -168,7 +156,6 @@ class ResourceCreateView(LoginRequiredMixin, View):
             "key": settings.API_KEY,
             "address": zip_code,
         }
-
         try:
             response = requests.get(url, params=params)
             response.raise_for_status()
@@ -188,7 +175,6 @@ class ResourceCreateView(LoginRequiredMixin, View):
         max_radius = 50000
         step_radius = 10000
         resources = []
-
         while initial_radius <= max_radius and not resources:
             params = {
                 "key": settings.API_KEY,
@@ -197,7 +183,6 @@ class ResourceCreateView(LoginRequiredMixin, View):
                 "keyword": query,
                 "type": "point_of_interest",
             }
-
             try:
                 response = requests.get(url, params=params)
                 response.raise_for_status()
@@ -222,10 +207,8 @@ class ResourceCreateView(LoginRequiredMixin, View):
                     initial_radius += step_radius
                 else:
                     break
-
             except requests.exceptions.RequestException as e:
                 break
-
         return resources
 
     def get_place_details(self, place_id):
@@ -236,7 +219,6 @@ class ResourceCreateView(LoginRequiredMixin, View):
             "place_id": place_id,
             "fields": "formatted_phone_number",
         }
-
         try:
             response = requests.get(url, params=params)
             response.raise_for_status()
@@ -264,7 +246,7 @@ class ResourceUpdateView(LoginRequiredMixin, View):
         form = ResourceForm(request.POST, instance=resource)
         if form.is_valid():
             form.save()
-            return redirect("resource_list")
+            return redirect(reverse("resource-detail", args=[resource.id]))
         return render(
             request,
             "resources/resource_form.html",
