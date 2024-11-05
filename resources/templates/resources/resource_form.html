@@ -25,6 +25,7 @@
   <div class="search-resources">
     <h3>Find Local Resources</h3>
     <form method="get" action="{% url 'resource_create' %}">
+      {% csrf_token %}
       <label for="query">ZIP Code:</label>
       <input type="text" id="query" name="query" placeholder="Enter ZIP Code" value="{{ query }}">
       
@@ -33,7 +34,6 @@
       
       <button type="submit">Search</button>
     </form>
-    
     
     {% if error_message %}
       <div class="alert alert-warning">{{ error_message }}</div>
@@ -65,7 +65,7 @@
   <hr>
   
   <div class="resource-form">
-    <form action="" method="post">
+    <form method="post" action="{% if resource %}{% url 'resource_edit' resource.id %}{% else %}{% url 'resource_create' %}{% endif %}">
       {% csrf_token %}
       {{ form.as_p }}
       <button type="submit" id="create-edit">

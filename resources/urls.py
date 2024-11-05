@@ -19,5 +19,4 @@ urlpatterns = [
         name="resource_delete",
     ),
     path("accounts/logout/", LogoutView.as_view(), name="logout"),
-    path('resources/add/', views.search_resources, name='resource_create'),
 ]

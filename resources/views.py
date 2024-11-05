@@ -12,42 +12,54 @@ from django.conf import settings
 from django.http import JsonResponse
 
 
+@login_required
 def search_resources(request):
-    query = request.GET.get("query", "resources")
-    location = request.GET.get("location", "37.7749,-122.4194")
-
-    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-    params = {
-        "key": settings.API_KEY,
-        "location": location,
-        "radius": 5000,
-        "keyword": query,
-    }
-
     resources = []
+    query = request.GET.get("query", "").strip()
+    location = request.GET.get("location", "37.7749,-122.4194")  # Default location if not provided
 
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
+    if query:  # Proceed only if a query is provided
+        url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+        params = {
+            "key": settings.API_KEY,
+            "location": location,
+            "radius": 5000,
+            "keyword": query,
+        }
 
-        resources = [
-            {
-                "name": place.get("name"),
-                "address": place.get("vicinity"),
-                "location": place.get("geometry", {}).get("location"),
-                "types": place.get("types"),
-            }
-            for place in data.get("results", [])
-        ]
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()  # Raise an error for bad responses
+            data = response.json()
 
-    except requests.exceptions.RequestException as e:
+            resources = [
+                {
+                    "name": place.get("name"),
+                    "address": place.get("vicinity"),
+                    "location": place.get("geometry", {}).get("location"),
+                    "types": place.get("types"),
+                }
+                for place in data.get("results", [])
+            ]
 
-        return render(
-            request,
-            "resources/resource_form.html",
-            {"resources": resources, "query": query},
-        )
+        except requests.exceptions.RequestException as e:
+            # Log the error if needed
+            print(f"Error fetching resources: {e}")
+
+            # Return an empty resources list if there was an error
+            resources = []
+
+    # Render the form with the resources found (or an empty list if none found)
+    return render(
+        request,
+        "resources/resource_form.html",
+        {
+            "resources": resources,
+            "query": query,
+            "no_results": not resources,  # This will help in handling the UI
+            "error_message": "No resources found." if not resources else None,
+        },
+    )
 
 
 @login_required
@@ -104,10 +116,12 @@ class ResourceCreateView(LoginRequiredMixin, View):
         location = None
         resources = []
         error_message = None
+
         if query.isdigit():
             location = self.get_coordinates_from_zip(query)
             if not location:
                 error_message = f"Could not retrieve location for ZIP code: {query}"
+        
         if location:
             search_query = keyword if keyword else query
             resources = self.search_resources(search_query, location)
@@ -127,6 +141,23 @@ class ResourceCreateView(LoginRequiredMixin, View):
                 "location": location,
                 "no_results": not resources,
                 "error_message": error_message,
+            },
+        )
+
+    def post(self, request):
+        form = ResourceForm(request.POST)
+        if form.is_valid():
+            resource = form.save(commit=False)
+            resource.user = request.user  # Associate the resource with the logged-in user
+            resource.save()
+            return redirect("resource_list")  # Redirect to the resource list after creation
+        # If the form is not valid, re-render the form with error messages
+        return render(
+            request,
+            "resources/resource_form.html",
+            {
+                "form": form,
+                "error_message": "Please correct the errors below.",
             },
         )
 
