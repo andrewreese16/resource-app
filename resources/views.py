@@ -14,47 +14,6 @@ from django.http import JsonResponse
 
 
 @login_required
-def search_resources(request):
-    resources = []
-    query = request.GET.get("query", "").strip()
-    location = request.GET.get("location", "37.7749,-122.4194")
-
-    if query:
-        url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-        params = {
-            "key": settings.API_KEY,
-            "location": location,
-            "radius": 5000,
-            "keyword": query,
-        }
-        try:
-            response = requests.get(url, params=params)
-            response.raise_for_status()
-            data = response.json()
-            resources = [
-                {
-                    "name": place.get("name"),
-                    "address": place.get("vicinity"),
-                    "location": place.get("geometry", {}).get("location"),
-                    "types": place.get("types"),
-                }
-                for place in data.get("results", [])
-            ]
-        except requests.exceptions.RequestException as e:
-            resources = []
-    return render(
-        request,
-        "resources/resource_form.html",
-        {
-            "resources": resources,
-            "query": query,
-            "no_results": not resources,
-            "error_message": "No resources found." if not resources else None,
-        },
-    )
-
-
-@login_required
 def resource_detail(request, resource_id):
     resource_from_db = get_object_or_404(Resource, id=resource_id)
     return render(request, "resources/detail.html", {"resource": resource_from_db})
@@ -169,9 +128,8 @@ class ResourceCreateView(LoginRequiredMixin, View):
             return None
 
     def search_resources(self, query, location):
-        """Search for resources using the Places API with increasing radius if no results are found."""
         url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-        initial_radius = 5000
+        initial_radius = 5000 
         max_radius = 50000
         step_radius = 10000
         resources = []
@@ -212,7 +170,6 @@ class ResourceCreateView(LoginRequiredMixin, View):
         return resources
 
     def get_place_details(self, place_id):
-        """Fetch detailed information for a place, including the phone number."""
         url = "https://maps.googleapis.com/maps/api/place/details/json"
         params = {
             "key": settings.API_KEY,
