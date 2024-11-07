@@ -9,6 +9,7 @@
   <section class="resource-container">
     <div class="resource-details">
       <h1>{{ resource.name }}</h1>
+      <div class="table-container">
       <table>
         <thead>
           <tr>
@@ -34,6 +35,7 @@
           </tr>
         </tbody>
       </table>
+    </div>
       <div class="back-container">
         <a href="{% url 'resource_list' %}">Back</a>
       </div>

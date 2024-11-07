@@ -9,6 +9,7 @@ body {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 .resource-details {
@@ -24,13 +25,19 @@ h1 {
   color: #4facfe;
 }
 
+.table-container {
+  overflow-x: auto;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
+  min-width: 600px;
 }
 
-th, td {
+th,
+td {
   border: 1px solid #ddd;
   padding: 12px;
   text-align: left;
@@ -73,4 +80,28 @@ a:hover {
 
 .back-container a:hover {
   background-color: #00f2fe;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.5em;
+  }
+
+  .resource-container {
+    padding: 10px;
+  }
+
+  .resource-details {
+    padding: 15px;
+  }
+
+  th,
+  td {
+    padding: 10px;
+    font-size: 0.9em;
+  }
+
+  .back-container a {
+    padding: 8px 12px;
+  }
 }
