@@ -10,7 +10,7 @@ from .models import Resource
 from .forms import ResourceForm
 import requests
 from django.conf import settings
-from django.http import JsonResponse
+
 
 
 @login_required
@@ -109,7 +109,6 @@ class ResourceCreateView(LoginRequiredMixin, View):
         )
 
     def get_coordinates_from_zip(self, zip_code):
-        """Convert a ZIP code to latitude and longitude using the Geocoding API."""
         url = "https://maps.googleapis.com/maps/api/geocode/json"
         params = {
             "key": settings.API_KEY,
